@@ -1,0 +1,55 @@
+:root {
+  --bg: #0f172a;
+  --panel: #111827;
+  --muted: #e5e7eb;
+  --primary: #3b82f6;
+}
+
+.shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: var(--bg);
+  color: var(--muted);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--panel);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.brand a { color: white; text-decoration: none; font-weight: 600; }
+
+.nav { display: flex; gap: 1rem; align-items: center; }
+.nav a { color: var(--muted); text-decoration: none; padding: 0.25rem 0.5rem; border-radius: 0.375rem; }
+.nav a:hover { color: white; background: rgba(255,255,255,0.06); }
+.active { color: white !important; background: rgba(59,130,246,0.15); }
+
+.profile { display: flex; align-items: center; gap: 0.5rem; }
+.avatar {
+  width: 32px; height: 32px; border-radius: 9999px;
+  background: linear-gradient(135deg, var(--primary), #06b6d4);
+  display: inline-flex; align-items: center; justify-content: center;
+  color: white; font-weight: 700; font-size: 0.9rem;
+}
+.username { font-weight: 500; }
+.logout {
+  background: transparent; color: var(--muted); border: 1px solid rgba(255,255,255,0.2);
+  padding: 0.25rem 0.6rem; border-radius: 0.375rem; cursor: pointer;
+}
+.logout:hover { color: white; border-color: rgba(255,255,255,0.35); }
+
+.main { padding: 1rem; }
+
+.footer {
+  padding: 0.75rem 1rem;
+  background: var(--panel);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  text-align: center;
+}
+
