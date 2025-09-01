@@ -8,6 +8,10 @@ const Login: React.FC = () => {
   const beginLogin = React.useCallback(() => {
     const url = new URL(authEndpoints.LOGIN_URL, window.location.origin);
     url.searchParams.set('returnUrl', callbackUrl);
+    // Pass through a profileId if present on initial URL (?profileId=...)
+    const initialQs = new URLSearchParams(window.location.search);
+    const profileId = initialQs.get('profileId');
+    if (profileId) url.searchParams.set('profileId', profileId);
     window.location.href = url.toString();
   }, [callbackUrl]);
 

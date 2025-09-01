@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../store/auth';
 import styles from './MainLayout.module.css';
-import { authEndpoints } from '../services/api';
+import { authEndpoints, apiFetch } from '../services/api';
 
 interface Props {
   children: ReactNode;
@@ -11,6 +11,16 @@ interface Props {
 const MainLayout: React.FC<Props> = ({ children }) => {
   const navigate = useNavigate();
   const { loggedIn, user, logout } = useAuth();
+  const [menus, setMenus] = React.useState<{ id: string; label: string; path: string }[]>([]);
+
+  React.useEffect(() => {
+    if (!loggedIn) { setMenus([]); return; }
+    const pid = user?.profileId ? `?profileId=${encodeURIComponent(user.profileId)}` : '';
+    apiFetch(`/api/menus${pid}`)
+      .then(r => r.json())
+      .then(data => setMenus(data.items || []))
+      .catch(() => setMenus([]));
+  }, [loggedIn, user?.profileId]);
 
   const handleLogout = () => {
     fetch(authEndpoints.LOGOUT_URL, { method: 'POST', credentials: 'include' }).finally(() => {
@@ -28,9 +38,9 @@ const MainLayout: React.FC<Props> = ({ children }) => {
         <nav className={styles.nav}>
           {loggedIn ? (
             <>
-              <NavLink to="/examples" className={({isActive}) => isActive ? styles.active : ''}>Examples</NavLink>
-              <NavLink to="/promocodes" className={({isActive}) => isActive ? styles.active : ''}>Promo Codes</NavLink>
-              <NavLink to="/change-password" className={({isActive}) => isActive ? styles.active : ''}>Change Password</NavLink>
+              {menus.map(m => (
+                <NavLink key={m.id} to={m.path} className={({isActive}) => isActive ? styles.active : ''}>{m.label}</NavLink>
+              ))}
             </>
           ) : (
             <NavLink to="/login" className={({isActive}) => isActive ? styles.active : ''}>Login</NavLink>

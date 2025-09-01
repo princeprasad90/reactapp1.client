@@ -39,6 +39,22 @@ export default tseslint.config([
 ])
 ```
 
+## BFF Integration & Dynamic Menus
+
+- Authentication is handled by a Backend-for-Frontend (BFF) served by the ASP.NET Core project.
+- The login page calls `GET /api/auth/login-redirect?returnUrl=<origin>/auth/callback` and optionally forwards `profileId` from the SPA URL.
+- After redirect back with tokens, the app stores them and derives `user.name` and `user.profileId` from the access token payload.
+- The header navigation is fetched dynamically from `GET /api/menus?profileId=<id>` and rendered when logged in.
+
+Environment variables (Vite):
+- `VITE_AUTH_LOGIN_URL` (default `/api/auth/login-redirect`)
+- `VITE_AUTH_REFRESH_URL` (default `/api/auth/refresh`)
+- `VITE_AUTH_LOGOUT_URL` (default `/api/auth/logout`)
+
+Quick test locally:
+- Start both projects, open `http://localhost:<spa-port>/?profileId=admin`.
+- Click “Continue to Sign In”. You should land on `/examples` with admin menus.
+
 You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
 ```js

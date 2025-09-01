@@ -179,3 +179,39 @@ const name = payload?.name || payload?.preferred_username || payload?.email || p
 
 For implementation references, see the file paths listed above. Update the env variables to point at your BFF endpoints before deploying.
 
+
+## Profile-Based Menus (Added)
+
+- Initial entry can include `?profileId=<id>` on the SPA (`/` route).
+- The login flow forwards `profileId` to the BFF when calling `VITE_AUTH_LOGIN_URL`.
+- The BFF encodes `profile_id` in the access token claims and persists it in an httpOnly cookie.
+- The React layout fetches menus from `GET /api/menus?profileId=<id>` (falls back to token claims) and renders the navigation dynamically.
+
+### Endpoints
+
+- `GET /api/menus?profileId=<id>`: returns `{ items: [{ id, label, path }] }` filtered by profile.
+
+#### Auth Endpoints (Current Implementation)
+
+- `GET /api/auth/login-redirect`
+  - Query: `returnUrl` (required), `profileId` (optional)
+  - Behavior: issues tokens, sets httpOnly cookies, redirects to `returnUrl` with `access_token` and `refresh_token` as query params.
+- `POST /api/auth/refresh`
+  - Body: `{ refreshToken?: string }` (optional if cookie present)
+  - Behavior: returns `{ accessToken, refreshToken?: null }` and keeps cookies.
+- `POST /api/auth/logout`
+  - Behavior: clears auth cookies; client clears local state.
+
+#### Example Responses
+
+`GET /api/menus?profileId=admin` →
+
+```json
+{
+  "items": [
+    { "id": "examples", "label": "Examples", "path": "/examples" },
+    { "id": "promocodes", "label": "Promo Codes", "path": "/promocodes" },
+    { "id": "change-password", "label": "Change Password", "path": "/change-password" }
+  ]
+}
+```

@@ -14,3 +14,10 @@ The following steps were used to generate this project:
 - Update proxy endpoint to be the backend server endpoint.
 - Add project to the startup projects list.
 - Write this file.
+
+## 2025-09-01
+
+- Add BFF-driven auth wiring in UI (parse `profile_id` from token, dynamic menus via `/api/menus`).
+- Update `Login.tsx` to forward `profileId` to BFF on login redirect.
+- Update `MainLayout.tsx` to fetch and render menus from BFF.
+- Document BFF integration and menus in `README.md` and `docs/auth-bff-jwt.md`.

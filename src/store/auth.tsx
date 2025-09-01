@@ -7,7 +7,7 @@ export interface Tokens {
   expiresAt?: number | null; // epoch seconds
 }
 
-interface UserInfo { name: string }
+interface UserInfo { name: string; profileId?: string | null }
 
 interface AuthContextValue {
   loggedIn: boolean;
@@ -32,7 +32,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (!tokens?.accessToken) return;
       const payload = JSON.parse(atob(tokens.accessToken.split('.')[1] || '')) as any;
       const name = payload?.name || payload?.preferred_username || payload?.sub || 'User';
-      setUser({ name: String(name) });
+      const profileId = payload?.profile_id ?? null;
+      setUser({ name: String(name), profileId: profileId ?? null });
     } catch {
       // ignore
     }
