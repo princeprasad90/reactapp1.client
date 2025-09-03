@@ -1,8 +1,10 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
+import type { ReactNode } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../store/auth';
 import styles from './MainLayout.module.css';
 import { authEndpoints, apiFetch } from '../services/api';
+import axios from 'axios';
 
 interface Props {
   children: ReactNode;
@@ -17,13 +19,12 @@ const MainLayout: React.FC<Props> = ({ children }) => {
     if (!loggedIn) { setMenus([]); return; }
     const pid = user?.profileId ? `?profileId=${encodeURIComponent(user.profileId)}` : '';
     apiFetch(`/api/menus${pid}`)
-      .then(r => r.json())
-      .then(data => setMenus(data.items || []))
+      .then(res => setMenus(res.data.items || []))
       .catch(() => setMenus([]));
   }, [loggedIn, user?.profileId]);
 
   const handleLogout = () => {
-    fetch(authEndpoints.LOGOUT_URL, { method: 'POST', credentials: 'include' }).finally(() => {
+    axios.post(authEndpoints.LOGOUT_URL, undefined, { withCredentials: true }).finally(() => {
       logout();
       navigate('/login');
     });

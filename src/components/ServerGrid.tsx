@@ -23,10 +23,9 @@ const ServerGrid: React.FC = () => {
 
   React.useEffect(() => {
     apiFetch(`/api/items?page=${page}&pageSize=5`)
-      .then(r => r.json())
-      .then(json => {
-        setData(json.items);
-        setTotal(json.totalCount);
+      .then(res => {
+        setData(res.data.items);
+        setTotal(res.data.totalCount);
       });
   }, [page]);
 

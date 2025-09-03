@@ -1,9 +1,11 @@
-export async function api<T>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(url, {
-    credentials: 'include',
+import axios, { AxiosRequestConfig } from 'axios';
+
+export async function api<T>(url: string, options?: AxiosRequestConfig): Promise<T> {
+  const res = await axios({
+    url,
+    withCredentials: true,
     headers: { 'Content-Type': 'application/json', ...(options?.headers || {}) },
     ...options
   });
-  if (!res.ok) throw new Error(res.statusText);
-  return res.json();
+  return res.data as T;
 }

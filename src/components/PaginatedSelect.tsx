@@ -5,7 +5,7 @@ import { apiFetch } from '../services/api';
 const loadOptions = async (inputValue: string, _loaded: any, additional: any) => {
   const page = additional.page || 1;
   const res = await apiFetch(`/api/items?page=${page}&pageSize=10&search=${encodeURIComponent(inputValue)}`);
-  const data = await res.json();
+  const data = res.data;
   return {
     options: data.items.map((i: any) => ({ value: i.id, label: i.name })),
     hasMore: page * 10 < data.totalCount,
