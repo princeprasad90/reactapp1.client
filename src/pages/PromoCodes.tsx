@@ -55,8 +55,8 @@ const PromoCodes: React.FC = () => {
     if (status) params.append('status', status);
 
     apiFetch(`/api/promocodes?${params.toString()}`)
-      .then(r => r.json())
-      .then((json: ApiResponse) => {
+      .then(res => {
+        const json: ApiResponse = res.data;
         setData(json.Data);
         setTotalPages(json.Pagination.TotalPages);
       });

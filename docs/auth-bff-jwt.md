@@ -69,9 +69,9 @@ Expose these in your Vite environment (`.env` / `.env.local`). Defaults shown in
 
 ### API Helper: `src/services/api.ts`
 
-- `apiFetch(input, init)`
+- `apiFetch(url, config)`
   - Attaches `Authorization: Bearer <accessToken>` from a shared in‑memory cache.
-  - On 401, calls `VITE_AUTH_REFRESH_URL` with `{ refreshToken }` and `credentials: 'include'`, updates tokens, and retries once.
+  - On 401, calls `VITE_AUTH_REFRESH_URL` with `{ refreshToken }` and `withCredentials`, updates tokens, and retries once.
   - Exports `authEndpoints` and `useWireTokens()`.
 - `useWireTokens()` keeps the in‑memory token cache aligned with `auth` context.
 
@@ -112,7 +112,7 @@ GET https://yourapp.example.com/auth/callback?access_token=...&refresh_token=...
 
 ### 4) Authed API Calls
 
-- Use `apiFetch(url, init)` instead of `fetch`.
+- Use the axios-based `apiFetch(url, config)` helper for requests.
 - `apiFetch` adds `Authorization` header automatically.
 - On 401, attempts refresh at `VITE_AUTH_REFRESH_URL` and retries once.
 
@@ -129,7 +129,7 @@ GET https://yourapp.example.com/auth/callback?access_token=...&refresh_token=...
 
 ## Migrating API Calls
 
-- Replace `fetch` with `apiFetch` for all endpoints that require authentication.
+- Replace direct HTTP calls with `apiFetch` for all endpoints that require authentication.
 - Examples updated:
   - `src/components/ServerGrid.tsx`
   - `src/pages/PromoCodes.tsx`
@@ -170,7 +170,7 @@ const name = payload?.name || payload?.preferred_username || payload?.email || p
 
 - Q: Can the BFF return tokens in the hash fragment instead of query?
   - A: Yes. The callback parses both.
-- Q: Do I need to change every `fetch`?
+- Q: Do I need to change every HTTP call?
   - A: Only calls that require authorization. For consistency, using `apiFetch` everywhere is fine.
 - Q: Can I auto‑redirect from `/login`?
   - A: Yes—uncomment the `beginLogin()` call in `Login.tsx`.

@@ -1,4 +1,5 @@
 import React from 'react';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { useAuth } from '../store/auth';
 
 // Env-configurable endpoints
@@ -24,30 +25,34 @@ export const setTokenCache = (accessToken: string | null, refreshToken?: string 
   notifyAuthChange();
 };
 
-export async function apiFetch(input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {
-  const attachAuth = (opts: RequestInit) => {
-    const headers = new Headers(opts.headers || {});
-    if (accessTokenCache) headers.set('Authorization', `Bearer ${accessTokenCache}`);
-    return { ...opts, headers };
+export async function apiFetch(url: string, init: AxiosRequestConfig = {}): Promise<AxiosResponse> {
+  const attachAuth = (cfg: AxiosRequestConfig) => {
+    const headers = { ...(cfg.headers || {}) } as Record<string, string>;
+    if (accessTokenCache) headers['Authorization'] = `Bearer ${accessTokenCache}`;
+    return {
+      withCredentials: true,
+      validateStatus: () => true,
+      ...cfg,
+      headers
+    };
   };
 
-  let res = await fetch(input, attachAuth(init));
+  let res = await axios({ url, ...attachAuth(init) });
   if (res.status !== 401) return res;
 
   // Try refresh
   if (!refreshTokenCache) return res;
-  const refreshRes = await fetch(REFRESH_URL, {
-    method: 'POST',
+  const refreshRes = await axios.post(REFRESH_URL, { refreshToken: refreshTokenCache }, {
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refreshToken: refreshTokenCache }),
-    credentials: 'include'
+    withCredentials: true,
+    validateStatus: () => true
   });
-  if (!refreshRes.ok) return res;
-  const refreshed = await refreshRes.json().catch(() => ({}));
+  if (refreshRes.status < 200 || refreshRes.status >= 300) return res;
+  const refreshed = refreshRes.data || {};
   if (refreshed?.accessToken) {
     setTokenCache(refreshed.accessToken, refreshed.refreshToken ?? refreshTokenCache);
     // retry once
-    res = await fetch(input, attachAuth(init));
+    res = await axios({ url, ...attachAuth(init) });
   }
   return res;
 }

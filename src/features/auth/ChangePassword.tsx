@@ -26,9 +26,9 @@ const ChangePassword: React.FC = () => {
       const res = await apiFetch('/api/auth/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values)
+        data: values
       });
-      if (!res.ok) throw new Error('Could not change password');
+      if (res.status < 200 || res.status >= 300) throw new Error('Could not change password');
     },
     onSuccess: () => setSuccess(true)
   });
